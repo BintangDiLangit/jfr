@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Public content: read by anyone, write by admin only.
+    match /settings/{doc}    { allow read: if true; allow write: if isAdmin(); }
+    match /hero/{doc}        { allow read: if true; allow write: if isAdmin(); }
+    match /services/{doc}    { allow read: if true; allow write: if isAdmin(); }
+    match /categories/{doc}  { allow read: if true; allow write: if isAdmin(); }
+    match /portfolio/{doc}   { allow read: if true; allow write: if isAdmin(); }
+    match /beforeAfter/{doc} { allow read: if true; allow write: if isAdmin(); }
+    match /gallery/{doc}     { allow read: if true; allow write: if isAdmin(); }
+    match /social_posts/{doc}{ allow read: if true; allow write: if isAdmin(); }
+    match /faq/{doc}         { allow read: if true; allow write: if isAdmin(); }
+    match /testimonials/{doc}{ allow read: if true; allow write: if isAdmin(); }
+    match /seo/{doc}         { allow read: if true; allow write: if isAdmin(); }
+
+    // Bookings: anyone can create a lead; only admin reads/updates.
+    match /bookings/{doc} {
+      allow create: if request.resource.data.keys().hasAll(
+        ['nama','phone','vehicleType','brand','model','keluhan','tanggal']);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admin allowlist: admin only.
+    match /admins/{uid} { allow read, write: if isAdmin(); }
+  }
+}
