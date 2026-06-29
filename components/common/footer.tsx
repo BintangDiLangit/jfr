@@ -51,7 +51,20 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
       </Container>
       <Container className="border-t border-border py-6 text-center text-xs text-muted">
-        © {new Date().getFullYear()} {settings.brandName}. All rights reserved.
+        <p>
+          © {new Date().getFullYear()} {settings.brandName}. All rights reserved.
+        </p>
+        <p className="mt-1">
+          Built by{" "}
+          <a
+            href="https://airatech.id"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline-offset-2 hover:underline"
+          >
+            PT AIRA TEKNOLOGI INDONESIA
+          </a>
+        </p>
       </Container>
     </footer>
   );
