@@ -25,6 +25,7 @@ export function SingleDocForm({
     setSaved(false);
     try {
       await saveSingle(collection, docId, form);
+      await fetch("/api/revalidate", { method: "POST" }).catch(() => {});
       setSaved(true);
     } finally {
       setBusy(false);

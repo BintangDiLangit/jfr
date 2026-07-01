@@ -8,6 +8,9 @@ import { FieldInput } from "@/components/admin/field-input";
 import { create, update, remove, type Doc } from "@/lib/firebase/repo";
 import type { EntityConfig } from "@/components/admin/types";
 
+// Purge the static page cache so public pages reflect the write immediately.
+const revalidate = () => fetch("/api/revalidate", { method: "POST" }).catch(() => {});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = Doc<Record<string, any>>;
 
@@ -31,6 +34,7 @@ export function CrudManager({ config }: { config: EntityConfig }) {
   async function onDelete(id: string) {
     if (!confirm("Hapus item ini?")) return;
     await remove(config.collection, id);
+    await revalidate();
   }
 
   return (
@@ -107,6 +111,7 @@ function EditDrawer({ config, row, onClose }: { config: EntityConfig; row: Row; 
       }
       if (isNew) await create(config.collection, data);
       else await update(config.collection, row.id, data);
+      await revalidate();
       onClose();
     } finally {
       setBusy(false);
