@@ -35,7 +35,7 @@ export function portfolioJsonLd(p: WithId<Portfolio>) {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: p.title,
-    description: p.seoDescription || p.description.slice(0, 160),
+    description: p.seoDescription || (p.description ?? "").slice(0, 160),
     image: [p.thumbnailUrl, ...p.gallery].filter(Boolean),
     url: `${SITE}/portfolio/${p.slug}`,
     about: `${p.brand} ${p.model}`,

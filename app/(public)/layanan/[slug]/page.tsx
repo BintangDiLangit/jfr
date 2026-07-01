@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!svc) return {};
   return {
     title: svc.title,
-    description: svc.description.slice(0, 160),
+    description: (svc.description ?? "").slice(0, 160),
     alternates: { canonical: `/layanan/${slug}` },
   };
 }

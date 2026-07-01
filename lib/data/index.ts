@@ -107,11 +107,25 @@ export async function getCategories(): Promise<WithId<Category>[]> {
   }, []);
 }
 
+/** Firestore docs skip fields left empty in the admin form; fill the array/
+ *  string defaults the UI and SEO helpers assume are always present. */
+function fillPortfolio(p: WithId<Portfolio>): WithId<Portfolio> {
+  return {
+    ...p,
+    description: p.description ?? "",
+    categoryIds: p.categoryIds ?? [],
+    gallery: p.gallery ?? [],
+    instagramUrls: p.instagramUrls ?? [],
+    tiktokUrls: p.tiktokUrls ?? [],
+    productsUsed: p.productsUsed ?? [],
+  };
+}
+
 export async function getPortfolios(opts?: { featured?: boolean; limit?: number }): Promise<WithId<Portfolio>[]> {
   return safe(async () => {
     const db = await getDb();
     const snap = await db.collection(COL.portfolio).where("published", "==", true).get();
-    let rows = mapDocs<Portfolio>(snap);
+    let rows = mapDocs<Portfolio>(snap).map(fillPortfolio);
     if (opts?.featured) rows = rows.filter((r) => r.featured);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rows.sort((a, b) => millis((b as any).createdAt) - millis((a as any).createdAt));
@@ -125,7 +139,7 @@ export async function getPortfolioBySlug(slug: string): Promise<WithId<Portfolio
     const snap = await db.collection(COL.portfolio).where("slug", "==", slug).limit(1).get();
     if (snap.empty) return null;
     const d = snap.docs[0];
-    return { id: d.id, ...(d.data() as Portfolio) };
+    return fillPortfolio({ id: d.id, ...(toPlain(d.data()) as Portfolio) });
   }, null);
 }
 

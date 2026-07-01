@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const p = await getPortfolioBySlug(slug);
   if (!p) return {};
   const title = p.seoTitle || p.title;
-  const description = p.seoDescription || p.description.slice(0, 160);
+  const description = p.seoDescription || (p.description ?? "").slice(0, 160);
   return {
     title,
     description,
@@ -38,8 +38,8 @@ export default async function PortfolioDetail({ params }: { params: Promise<{ sl
   if (!p) notFound();
 
   const related = (await getPortfolios({ limit: 4 })).filter((r) => r.id !== p.id).slice(0, 3);
-  const igId = p.instagramUrls[0];
-  const ttId = p.tiktokUrls[0] ? tiktokVideoId(p.tiktokUrls[0]) : null;
+  const igId = p.instagramUrls?.[0];
+  const ttId = p.tiktokUrls?.[0] ? tiktokVideoId(p.tiktokUrls[0]) : null;
 
   return (
     <article className="py-12 sm:py-16">
@@ -85,7 +85,7 @@ export default async function PortfolioDetail({ params }: { params: Promise<{ sl
               <p className="mt-3 whitespace-pre-line text-muted">{p.description}</p>
             </section>
 
-            {p.gallery.length > 0 && (
+            {p.gallery?.length > 0 && (
               <section>
                 <h2 className="mb-4 text-xl font-semibold">Galeri</h2>
                 <PortfolioGallery images={p.gallery} title={p.title} />
@@ -115,7 +115,7 @@ export default async function PortfolioDetail({ params }: { params: Promise<{ sl
 
           <aside className="space-y-6">
             <div className="glass rounded-2xl p-6">
-              {p.productsUsed.length > 0 && (
+              {p.productsUsed?.length > 0 && (
                 <>
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">Produk Dipakai</h3>
                   <div className="mt-3 flex flex-wrap gap-2">
